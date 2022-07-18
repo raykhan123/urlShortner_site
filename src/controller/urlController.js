@@ -7,6 +7,8 @@ const createUrl = async function (req, res) {
 
         const requestBody = req.body
         const longURL = requestBody.longUrl;
+        if(!longURL){return res.status(400).send({msg:"plz provide the Url"})}
+        if(checkingUrl){return res.status(400).send({msg:"already exist",data:checkingUrl})}
         const baseUrl = 'http://localhost:3000'
         let urlCode = shortid.generate(longURL)
        let  requiredUrl= baseUrl+"/"+urlCode 
