@@ -29,10 +29,10 @@ const createUrl = async function (req, res) {
             return res.status(400).send({ status: false, messege: 'Invalid  URL' })
         }
 
-        const isAlreadyGen = await urlModel.findOne({longUrl:longUrl})
-        console.log(isAlreadyGen)
+        const isAlreadyGen = await urlModel.findOne({longUrl:longUrl}).select({longUrl:1,shortUrl:1,urlCode:1,_id:0})
+       // console.log(isAlreadyGen)
         if(isAlreadyGen){
-            return res.status(400).send({status:true,message:"Short link already generated for this url"})
+            return res.status(400).send({status:true,message:"Short link already generated for this url",data:isAlreadyGen})
         }
 
             const baseUrl = 'http://localhost:3000'
@@ -53,7 +53,9 @@ const createUrl = async function (req, res) {
                 urlCode: urlCode,
                 shortUrl: requiredUrl
             }
-            res.status(200).send({ status:true,data: obj })
+            let data = await urlModel.create(obj)
+            let createdData = await urlModel.findOne({data:data}).select({longUrl:1,shortUrl:1,urlCode:1,_id:0})
+            res.status(200).send({ status:true,data: createdData })
 
 
         } catch (error) {
