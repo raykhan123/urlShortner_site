@@ -17,7 +17,7 @@ const createUrl = async function (req, res) {
         const requestBody = req.body
         
         if (!isValidRequestBody(requestBody)) {
-            return res.status(400).send({ status: false, message: "Please provide data or provide only one longurl" })
+            return res.status(400).send({ status: false, message: "Please provide data or provide longurl" })
         }
         const longUrl = requestBody.longUrl;
 
@@ -65,7 +65,26 @@ const createUrl = async function (req, res) {
     }
 
 
-    // const getUrl = async function(req,res){
+     const getUrl = async function(req,res){
+        try {
+          const  urlCode= req.params.urlCode
+            const url = await urlModel.findOne({urlCode:urlCode})
+            if (url) {
 
-    // }
+                return res.status(302).send({status:true}).redirect(url.longUrl)
+            } else {
+
+                return res.status(404).send({status:false,message:'No URL Found'})
+            }
+    
+        
+        }catch (err) {
+            console.error(err)
+            res.status(500).send({ status: false, msg: error.message })
+        }
+
+
+     
+    }
 module.exports.createUrl = createUrl;
+module.exports.getUrl = getUrl;
