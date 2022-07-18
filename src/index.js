@@ -1,9 +1,9 @@
 const express = require('express')
 const mongoose = require('mongoose')
 const bodyParser = require('body-parser')
-const route = require('./route/route')
+const route = require('./routes/route');
 const validUrl = require('valid-url');
-const ids = require('short-id');
+const ids = require('shortid');
 
 const app = express()
 app.use(bodyParser.json())
