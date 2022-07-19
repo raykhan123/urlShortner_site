@@ -1,6 +1,7 @@
 const urlModel = require("../model/urlModel")
 const validUrl = require('valid-url')
 const shortid = require('shortid')
+const axios = require('axios')
 
 const isValid = function (value) {
     if (typeof value === "undefined" || value === null) return false;
@@ -28,9 +29,22 @@ const createUrl = async function (req, res) {
         if (!validUrl.isUri(longUrl)) {
             return res.status(400).send({ status: false, messege: 'Invalid  URL' })
         }
+        // let option = {
+        //     method:'Get',
+        //     url:longUrl
+        // }
+        // let exist = await axios(option).then((res)=>{
+        //     if(!(res.status===201||res.status===200)){
+        //         return res.status(400).send({ status: false, messege: 'Invalid  URL' })
+        //     }
+        // }).catch((error)=>{})
 
+        
+        
+        // if(exist.status===400||exist.status===404){
+        //     return res.status(400).send({ status: false, messege: 'Invalid  URL' })
+        // }
         const isAlreadyGen = await urlModel.findOne({longUrl:longUrl}).select({longUrl:1,shortUrl:1,urlCode:1,_id:0})
-       // console.log(isAlreadyGen)
         if(isAlreadyGen){
             return res.status(400).send({status:true,message:"Short link already generated for this url",data:isAlreadyGen})
         }
@@ -55,7 +69,7 @@ const createUrl = async function (req, res) {
             }
             let data = await urlModel.create(obj)
             let createdData = await urlModel.findOne({data:data}).select({longUrl:1,shortUrl:1,urlCode:1,_id:0})
-            res.status(200).send({ status:true,data: createdData })
+            res.status(201).send({ status:true,data: createdData })
 
 
         } catch (error) {
@@ -71,7 +85,7 @@ const createUrl = async function (req, res) {
             const url = await urlModel.findOne({urlCode:urlCode})
             if (url) {
 
-                return res.status(302).send({status:true}).redirect(url.longUrl)
+                return res.status(302).redirect(url.longUrl)
             } else {
 
                 return res.status(404).send({status:false,message:'No URL Found'})
@@ -80,7 +94,7 @@ const createUrl = async function (req, res) {
         
         }catch (err) {
             console.error(err)
-            res.status(500).send({ status: false, msg: error.message })
+            res.status(500).send({ status: false, msg: err.message })
         }
 
 
