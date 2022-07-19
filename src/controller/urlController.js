@@ -4,7 +4,7 @@ const shortid = require('shortid')
 const axios = require('axios')
 
 const isValid = function (value) {
-    if (typeof value === "undefined" || value === null) return false;
+    if (typeof value === "undefined" || value === null ||typeof value ==='number') return false;
     if (typeof value === "string" && value.trim().length === 0) return false;
     return true;
 };
@@ -23,7 +23,7 @@ const createUrl = async function (req, res) {
         const longUrl = requestBody.longUrl;
 
         if (!isValid(longUrl)) {
-            return res.status(400).send({ status: false, message: "Please provide longUrl" })
+            return res.status(400).send({ status: false, message: "Please provide a valid longUrl" })
         }
 
         if (!validUrl.isUri(longUrl)) {
