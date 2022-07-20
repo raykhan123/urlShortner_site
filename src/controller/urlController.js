@@ -1,7 +1,7 @@
 const urlModel = require("../model/urlModel")
 const validUrl = require('valid-url')
 const shortid = require('shortid')
-const axios = require('axios')
+// const axios = require('axios')
 
 const isValid = function (value) {
     if (typeof value === "undefined" || value === null ||typeof value ==='number') return false;
@@ -12,6 +12,8 @@ const isValid = function (value) {
 const isValidRequestBody = function (requestBody) {
     return Object.keys(requestBody).length == 1;
 };
+
+
 
 const createUrl = async function (req, res) {
     try {
@@ -51,7 +53,6 @@ const createUrl = async function (req, res) {
 
             const baseUrl = 'http://localhost:3000'
             let urlCode = shortid.generate(longUrl)
-    
             let checkUrlCode = await urlModel.findOne({ urlCode: urlCode });
             if (checkUrlCode) {
                 return res.status(400)
