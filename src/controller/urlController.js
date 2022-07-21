@@ -15,11 +15,12 @@ const isValidRequestBody = function (requestBody) {
 };
 //Connect to redis
 const redisClient = redis.createClient(
-    13190,
-    "redis-13190.c301.ap-south-1-1.ec2.cloud.redislabs.com",
+    18787,
+   // "redis-13190.c301.ap-south-1-1.ec2.cloud.redislabs.com",
+    "redis-18787.c301.ap-south-1-1.ec2.cloud.redislabs.com",
     { no_ready_check: true }
 );
-redisClient.auth("gkiOIPkytPI3ADi14jHMSWkZEo2J5TDG", function (err) {
+redisClient.auth("CBouv7eqipQQFOWH0sscDpYsyzRcfLH0", function (err) {
     if (err) throw err;
 });
 
@@ -50,11 +51,18 @@ const createUrl = async function (req, res) {
         if (!validUrl.isUri(longUrl)) {
             return res.status(400).send({ status: false, messege: 'Invalid  URL' })
         }
-   
+
+
+        let cachedUrlData = await GET_ASYNC (`${req.body.longUrl}`)
+
+        if(cachedUrlData){
+            return res.status(400).send({status:false,message:"Short link (cache) already generated for this url",data:JSON.parse(cachedUrlData)})
+        }
 
         const isAlreadyGen = await urlModel.findOne({ longUrl: longUrl }).select({ longUrl: 1, shortUrl: 1, urlCode: 1, _id: 0 })
         // console.log(isAlreadyGen)
         if (isAlreadyGen) {
+            await SET_ASYNC(`${req.body.longUrl}`,JSON.stringify(isAlreadyGen))
             return res.status(400).send({ status:false , message: "Short link already generated for this url", data: isAlreadyGen })
         }
 
@@ -79,6 +87,7 @@ const createUrl = async function (req, res) {
         }
         let data = await urlModel.create(obj)
        let createdData = await urlModel.findOne(data).select({ longUrl: 1, shortUrl: 1, urlCode: 1, _id: 0 })
+       await SET_ASYNC(`${req.body.longUrl}`, JSON.stringify(createdData))
         res.status(201).send({ status: true, data: createdData })
 
 
@@ -108,10 +117,11 @@ const getUrl = async function (req, res) {
             if (url) {
            
               await SET_ASYNC(`${req.params.urlCode}`, JSON.stringify(url.longUrl))
-                return res.status(302).redirect(url.longUrl)
+              console.log(url)
+             return res.status(302).redirect(url.longUrl)
             } else {
 
-                return res.status(404).send({ status: false, message: 'No URL Found' })
+                return res.status(404).send({ status: false, message: 'Short URL not Found' })
             }
         }
 
