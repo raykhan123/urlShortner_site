@@ -58,7 +58,7 @@ const createUrl = async function(req, res) {
         let cachedUrlData = await GET_ASYNC(`${req.body.longUrl}`)
 
         if (cachedUrlData) {
-            return res.status(400).send({ status: false, message: "Short link (cache) already generated for this url", data: JSON.parse(cachedUrlData) })
+            return res.status(200).send({ status: true, message: "Short link (cache) already generated for this url", data: JSON.parse(cachedUrlData) })
         }
 
         const isAlreadyGen = await urlModel.findOne({ longUrl: longUrl }).select({ longUrl: 1, shortUrl: 1, urlCode: 1, _id: 0 })
